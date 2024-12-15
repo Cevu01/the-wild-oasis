@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+//ovde mozemo direktno da postavimo type
 const FileInput = styled.input.attrs({ type: "file" })`
   font-size: 1.4rem;
   border-radius: var(--border-radius-sm);

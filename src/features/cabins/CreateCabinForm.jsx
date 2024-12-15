@@ -63,16 +63,17 @@ function CreateCabinForm() {
 
   //react-hook-form hook
 
+  //data su podaci iz forme koju je user popunio
   function onSubmit(data) {
-    //ovako povezujeom stvari :)
-    mutate(data);
+    //The data object is passed as newCabin to your mutate function, which in turn calls createCabin(newCabin).
+    mutate({ ...data, image: data.image[0] });
   }
 
   function onError(errors) {
     // console.log(errors);
   }
   return (
-    //kada neko polje nije popunjeno onError funkcija ce biti pozvana
+    //kada neko polje nije popunjeno onError funkcija ce biti pozvana, a onSubmit nece biti pozvana(ne pravimo nepotrebne api calls)
     <Form onSubmit={handleSubmit(onSubmit, onError)}>
       <FormRow label="Cabin name" error={errors?.name?.message}>
         <Input
