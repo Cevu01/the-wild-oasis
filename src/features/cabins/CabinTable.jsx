@@ -6,7 +6,7 @@ import CabinRow from "./CabinRow";
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
-
+  flex: 1;
   font-size: 1.4rem;
   background-color: var(--color-grey-0);
   border-radius: 7px;
@@ -29,7 +29,7 @@ const TableHeader = styled.header`
 `;
 
 //data: cabins sadrzi podatke koje je funkcija getCabins vratila
-//kad kod se desi invalidate ova komponenta re-fetchuje cabins sa supabase-a
+//kad kod se desi invalidate(odnosno kada state postane stale) ova komponenta re-fetchuje cabins sa supabase-a
 function CabinTable() {
   const {
     isLoading,
