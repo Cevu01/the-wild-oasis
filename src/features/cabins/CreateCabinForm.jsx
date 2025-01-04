@@ -1,5 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-hot-toast";
+import { useForm } from "react-hook-form";
 
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
@@ -8,12 +7,13 @@ import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import FormRow from "../../ui/FormRow";
 
-import { createEditCabin } from "../../services/apiCabins";
-import { useForm } from "react-hook-form";
+import { useCreateCabin } from "./useCreateCabin";
+import { useEditCabin } from "./useEditCabin";
+
+// Kada kliknem na dugme za edit prosledjuju se podaci o kliknutoj cabini(cabinToEdit) u ovu komponentu, ako editujemo prosledjujemo izeditovane podatke o cabini i  id u funkciju createEditCabin, ako creatujemo prosledjujemo samo nove kreiranje podatke o cabini(koje smo dobili iz forme)
 
 function CreateCabinForm({ cabinToEdit = {} }) {
   const { id: editId, ...editValues } = cabinToEdit;
-  console.log(editId);
   //ako ima editId, isEditSession ce biti true, u suprotnom ce biti false
   const isEditSession = Boolean(editId);
 
@@ -22,29 +22,9 @@ function CreateCabinForm({ cabinToEdit = {} }) {
   });
   const { errors } = formState;
 
-  const queryClient = useQueryClient();
+  const { isCreating, createCabin } = useCreateCabin();
 
-  const { mutate: createCabin, isLoading: isCreating } = useMutation({
-    mutationFn: (newCabin) => createEditCabin(newCabin), // isto je mutationFn: createCabin,
-    onSuccess: () => {
-      toast.success("New cabin successfully crated");
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-      //sa reset brisemo input polja
-      reset();
-    },
-    onError: (err) => toast.error(err.message),
-  });
-
-  const { mutate: editCabin, isLoading: isEditing } = useMutation({
-    mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id), // isto je mutationFn: createCabin,
-    onSuccess: () => {
-      toast.success("Cabin successfully edited");
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-      //sa reset brisemo input polja
-      reset();
-    },
-    onError: (err) => toast.error(err.message),
-  });
+  const { isEditing, editCabin } = useEditCabin();
 
   const isWorking = isCreating || isEditing;
 
@@ -52,9 +32,13 @@ function CreateCabinForm({ cabinToEdit = {} }) {
   function onSubmit(data) {
     const image = typeof data.image === "string" ? data.image : data.image[0];
     if (isEditSession)
-      editCabin({ newCabinData: { ...data, image }, id: editId });
+      editCabin(
+        { newCabinData: { ...data, image }, id: editId },
+        { onSuccess: (data) => reset() }
+      );
     //The data object is passed as newCabin to your mutate function, which in turn calls createCabin(newCabin).
-    else createCabin({ ...data, image: image });
+    else
+      createCabin({ ...data, image: image }, { onSuccess: (data) => reset() }); //ovde imamo pristup novom kreiranom objektu, odnosno data koje vraca createEditCabin funkcija
   }
 
   function onError(errors) {
@@ -119,8 +103,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
       </FormRow>
 
       <FormRow
-        label="Description"
-        disabled={isWorking}
+        label="Description fro website"
         error={errors?.description?.message}
       >
         <Textarea
