@@ -1,7 +1,7 @@
 import supabase from "./supabase";
 
 export async function getSettings() {
-  const { data, error } = await supabase.from("settings").select("*").single();
+  const { data, error } = await supabase.from("settings").select("*").single(); //single vraca data kao jedan objekat, umesto niz objekta, umesto toga mozemo i vratiti data[0]
 
   if (error) {
     console.error(error);
