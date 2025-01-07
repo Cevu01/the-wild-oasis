@@ -12,7 +12,7 @@ import { useEditCabin } from "./useEditCabin";
 
 // Kada kliknem na dugme za edit prosledjuju se podaci o kliknutoj cabini(cabinToEdit) u ovu komponentu, ako editujemo prosledjujemo izeditovane podatke o cabini i  id u funkciju createEditCabin, ako creatujemo prosledjujemo samo nove kreiranje podatke o cabini(koje smo dobili iz forme)
 
-function CreateCabinForm({ cabinToEdit = {} }) {
+function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = cabinToEdit;
   //ako ima editId, isEditSession ce biti true, u suprotnom ce biti false
   const isEditSession = Boolean(editId);
@@ -38,7 +38,15 @@ function CreateCabinForm({ cabinToEdit = {} }) {
       );
     //The data object is passed as newCabin to your mutate function, which in turn calls createCabin(newCabin).
     else
-      createCabin({ ...data, image: image }, { onSuccess: (data) => reset() }); //ovde imamo pristup novom kreiranom objektu, odnosno data koje vraca createEditCabin funkcija
+      createCabin(
+        { ...data, image: image },
+        {
+          onSuccess: (data) => {
+            reset();
+            onCloseModal?.();
+          },
+        }
+      ); //ovde imamo pristup novom kreiranom objektu, odnosno data koje vraca createEditCabin funkcija
   }
 
   function onError(errors) {
@@ -46,7 +54,10 @@ function CreateCabinForm({ cabinToEdit = {} }) {
   }
   return (
     //kada neko polje nije popunjeno onError funkcija ce biti pozvana, a onSubmit nece biti pozvana(ne pravimo nepotrebne api calls)
-    <Form onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      type={onCloseModal ? "modal" : "regular"}
+    >
       <FormRow label="Cabin name" error={errors?.name?.message}>
         <Input
           type="text"
@@ -103,7 +114,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
       </FormRow>
 
       <FormRow
-        label="Description fro website"
+        label="Description for website"
         error={errors?.description?.message}
       >
         <Textarea
@@ -127,7 +138,11 @@ function CreateCabinForm({ cabinToEdit = {} }) {
 
       <FormRow>
         {/* type is an HTML attribute!, type = "reset" je obican html, obrise sve iz input filda */}
-        <Button variation="secondary" type="reset">
+        <Button
+          onClick={() => onCloseModal?.()}
+          variation="secondary"
+          type="reset"
+        >
           Cancel
         </Button>
         <Button disabled={isWorking}>
