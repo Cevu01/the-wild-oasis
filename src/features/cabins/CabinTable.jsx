@@ -1,10 +1,10 @@
-import styled from "styled-components";
 import Spinner from "../../ui/Spinner";
 import CabinRow from "./CabinRow";
 import { useCabins } from "./useCabins";
 import Table from "../../ui/Table";
 import Menus from "../../ui/Menus";
 import { useSearchParams } from "react-router-dom";
+import Empty from "../../ui/Empty";
 
 //data: cabins sadrzi podatke koje je funkcija getCabins vratila
 //kad kod se desi invalidate(odnosno kada state postane stale) ova komponenta re-fetchuje cabins sa supabase-a
@@ -13,6 +13,7 @@ function CabinTable() {
   const [searchParams] = useSearchParams();
   if (isLoading) return <Spinner />;
 
+  //1) Filter
   const filterValue = searchParams.get("discount") || "all";
 
   let filteredCabins;
@@ -24,6 +25,19 @@ function CabinTable() {
   if (filterValue === "with-discount") {
     filteredCabins = cabins.filter((cabin) => cabin.discount > 0);
   }
+
+  //2) Sort
+
+  const sortBy = searchParams.get("sortBy") || "startDate-asc";
+  const [field, direction] = sortBy.split("-");
+  const modifier = direction === "asc" ? 1 : -1;
+  //logika za sortiranje cabin-a
+  const sortedCabins = filteredCabins.sort(
+    (a, b) => (a[field] - b[field]) * modifier
+  );
+
+  if (!cabins.length) return <Empty resourceName="cabins" />;
+
   return (
     //role pomaze borwseru da skonta koji je html element u pitanju
     <Menus>
@@ -37,7 +51,7 @@ function CabinTable() {
           <div></div>
         </Table.Header>
         <Table.Body
-          data={filteredCabins}
+          data={sortedCabins}
           render={(cabin) => <CabinRow cabin={cabin} key={cabin.id} />}
         />
       </Table>
