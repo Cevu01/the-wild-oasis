@@ -11,7 +11,9 @@ const StyledFilter = styled.div`
   gap: 0.4rem;
 `;
 
-const FilterButton = styled.button`
+const FilterButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== "active", // Filter out the `active` prop, ovo je gpt dodao zato sto je acitve prop izbacivao gresku radio dole
+})`
   background-color: var(--color-grey-0);
   border: none;
 
