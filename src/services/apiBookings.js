@@ -1,12 +1,12 @@
 import { getToday } from "../utils/helpers";
 import supabase from "./supabase";
+import { PAGE_SIZE } from "../utils/constants";
 
-export async function getBookings({ filter, sortBy, method }) {
-  let query = supabase
-    .from("bookings")
-    .select(
-      "id, created_at, startDate, endDate, numNights, numGuests, status,totalPrice, cabins(name), guests(fullName, email)"
-    ); //Na ovaj nacin dobija podatke o cabins i guests redovima cabin(*), guests(*), odnosno onaj red ciji se id nalazi u bookings redu
+export async function getBookings({ filter, sortBy, method, page }) {
+  let query = supabase.from("bookings").select(
+    "id, created_at, startDate, endDate, numNights, numGuests, status,totalPrice, cabins(name), guests(fullName, email)",
+    { count: "exact" } //mozemo da fetchujemo kolko mi rezultata hocemo, count: "exact" - ovo su svi rezultati
+  ); //Na ovaj nacin dobija podatke o cabins i guests redovima cabin(*), guests(*), odnosno onaj red ciji se id nalazi u bookings redu
 
   //FILTER
   if (filter) query = query[filter.method || "eq"](filter.field, filter.value); // na ovaj nacin i methodu prosledjujemo umesto staticki eq(filter.field, filter.value)
@@ -16,13 +16,22 @@ export async function getBookings({ filter, sortBy, method }) {
     query = query.order(sortBy.field, {
       ascending: sortBy.direction === "asc",
     });
-  const { data, error } = await query;
+
+  //PAGINATION
+  if (page) {
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
+  //ovde kada saljem supabese-u query, on moze biti i filter i sort i pagination u isto vreme i li odvojeno(query je objekat koji se nadogradjuje-updajtuje)
+  const { data, error, count } = await query;
   if (error) {
     console.error(error);
     throw new Error("Bookings could not be loaded");
   }
 
-  return data;
+  return { data, count };
 }
 
 export async function getBooking(id) {
