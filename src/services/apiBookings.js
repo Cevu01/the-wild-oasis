@@ -24,7 +24,7 @@ export async function getBookings({ filter, sortBy, method, page }) {
     query = query.range(from, to);
   }
 
-  //ovde kada saljem supabese-u query, on moze biti i filter i sort i pagination u isto vreme i li odvojeno(query je objekat koji se nadogradjuje-updajtuje)
+  //ovde kada saljem supabese-u query, on moze biti i filter i sort i pagination u isto vreme ili odvojeno(query je objekat koji se nadogradjuje-updajtuje)
   const { data, error, count } = await query;
   if (error) {
     console.error(error);
