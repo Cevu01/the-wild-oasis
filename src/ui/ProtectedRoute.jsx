@@ -16,10 +16,7 @@ function ProtectedRoute({ children }) {
   //navigate mozemo da pozovemo samo u drugoj nekoj funkciji, ne mozemo u top level kodu!
   const navigate = useNavigate();
   //1. Load the authenticated user
-
   const { isLoading, isAuthenticated } = useUser();
-
-  //2. While loading, show spinner
 
   //3. If there is NO authenticated user, redirect to the /login
   useEffect(
@@ -29,6 +26,7 @@ function ProtectedRoute({ children }) {
     [isAuthenticated, navigate, isLoading]
   );
 
+  //2. While loading, show spinner
   if (isLoading)
     return (
       <FullPage>
