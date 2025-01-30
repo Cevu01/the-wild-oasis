@@ -23,7 +23,7 @@ function SignupForm() {
           type="text"
           id="fullName"
           disabled={isLoading}
-          {...register("fullname", { required: "This field is required" })}
+          {...register("fullName", { required: "This field is required" })}
         />
       </FormRow>
 
