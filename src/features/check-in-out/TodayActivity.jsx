@@ -32,12 +32,12 @@ const TodayList = styled.ul`
   -ms-overflow-style: none;
 `;
 
-const NoActivity = styled.p`
-  text-align: center;
-  font-size: 1.8rem;
-  font-weight: 500;
-  margin-top: 0.8rem;
-`;
+// const NoActivity = styled.p`
+//   text-align: center;
+//   font-size: 1.8rem;
+//   font-weight: 500;
+//   margin-top: 0.8rem;
+// `;
 
 function TodayActivity() {
   const { isLoading, activities } = useTodayActivity();

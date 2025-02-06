@@ -1,9 +1,5 @@
 import styled, { css } from "styled-components";
 
-const test = css`
-  text-align: center;
-`;
-
 const Heading = styled.h1`
   ${(props) =>
     props.as === "h1" &&
